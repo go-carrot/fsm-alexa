@@ -1,37 +1,37 @@
 package fsmalexa
 
 type Status struct {
-	Code string `json:"code"`
+	Code string `json:"code,omitempty"`
 }
 
 type ResolvedValue struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type SlotValue struct {
-	Value ResolvedValue `json:"value"`
+	Value ResolvedValue `json:"value,omitempty"`
 }
 
 type Authority struct {
-	Authority string      `json:"authority"`
-	Status    Status      `json:"status"`
-	Values    []SlotValue `json:"values"`
+	Authority string      `json:"authority,omitempty"`
+	Status    Status      `json:"status,omitempty"`
+	Values    []SlotValue `json:"values,omitempty"`
 }
 
 type Resolutions struct {
-	ResolutionsPerAuthority []Authority `json:"resolutionsPerAuthority"`
+	ResolutionsPerAuthority []Authority `json:"resolutionsPerAuthority,omitempty"`
 }
 
 type SlotObject struct {
-	Name               string      `json:"name"`
-	Value              string      `json:"value"`
-	ConfirmationStatus string      `json:"confirmationStatus"`
-	Resolutions        Resolutions `json:"resolutions"`
+	Name               string      `json:"name,omitempty"`
+	Value              string      `json:"value,omitempty"`
+	ConfirmationStatus string      `json:"confirmationStatus,omitempty"`
+	Resolutions        Resolutions `json:"resolutions,omitempty"`
 }
 
 type Intent struct {
-	Name               string                `json:"name"`
-	ConfirmationStatus string                `json:"confirmationStatus"`
-	Slots              map[string]SlotObject `json:"slots"`
+	Name               string                `json:"name,omitempty"`
+	ConfirmationStatus string                `json:"confirmationStatus,omitempty"`
+	Slots              map[string]SlotObject `json:"slots,omitempty"`
 }

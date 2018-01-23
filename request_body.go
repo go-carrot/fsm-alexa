@@ -1,74 +1,74 @@
 package fsmalexa
 
 type Permissions struct {
-	ConsentToken string `json:"consentToken"`
+	ConsentToken string `json:"consentToken,omitempty"`
 }
 
 type Application struct {
-	ApplicationID string `json:"applicationId"`
+	ApplicationID string `json:"applicationId,omitempty"`
 }
 
 type User struct {
-	UserID      string      `json:"userId"`
-	AccessToken string      `json:"accessToken"`
-	Permissions Permissions `json:"permissions"`
+	UserID      string      `json:"userId,omitempty"`
+	AccessToken string      `json:"accessToken,omitempty"`
+	Permissions Permissions `json:"permissions,omitempty"`
 }
 
 type Session struct {
-	New         bool                   `json:"new"`
-	SessionID   string                 `json:"sessionId"`
-	Application Application            `json:"application"`
-	Attributes  map[string]interface{} `json:"attributes"`
-	User        User                   `json:"user"`
+	New         bool                   `json:"new,omitempty"`
+	SessionID   string                 `json:"sessionId,omitempty"`
+	Application Application            `json:"application,omitempty"`
+	Attributes  map[string]interface{} `json:"attributes,omitempty"`
+	User        User                   `json:"user,omitempty"`
 }
 
 type SupportedInterfaces struct {
-	AudioPlayer interface{} `json:"AudioPlayer"`
+	AudioPlayer interface{} `json:"AudioPlayer,omitempty"`
 }
 
 type Device struct {
-	DeviceID            string              `json:"deviceId"`
-	SupportedInterfaces SupportedInterfaces `json:"SupportedInterfaces"`
+	DeviceID            string              `json:"deviceId,omitempty"`
+	SupportedInterfaces SupportedInterfaces `json:"SupportedInterfaces,omitempty"`
 }
 
 type System struct {
-	Device         Device      `json:"device"`
-	Application    Application `json:"application"`
-	User           User        `json:"user"`
-	APIEndpoint    string      `json:"apiEndpoint"`
-	APIAccessToken string      `json:"apiAccessToken"`
+	Device         Device      `json:"device,omitempty"`
+	Application    Application `json:"application,omitempty"`
+	User           User        `json:"user,omitempty"`
+	APIEndpoint    string      `json:"apiEndpoint,omitempty"`
+	APIAccessToken string      `json:"apiAccessToken,omitempty"`
 }
 
 type AudioPlayer struct {
-	PlayerActivity       string `json:"playerActivity"`
-	Token                string `json:"token"`
-	OffsetInMilliseconds int    `json:"offsetInMilliseconds"`
+	PlayerActivity       string `json:"playerActivity,omitempty"`
+	Token                string `json:"token,omitempty"`
+	OffsetInMilliseconds int    `json:"offsetInMilliseconds,omitempty"`
 }
 
 type Context struct {
-	System      System      `json:"System"`
-	AudioPlayer AudioPlayer `json:"AudioPlayer"`
+	System      System      `json:"System,omitempty"`
+	AudioPlayer AudioPlayer `json:"AudioPlayer,omitempty"`
 }
 
 type Error struct {
-	Type    string `json:"type"`
-	Message string `json:"message"`
+	Type    string `json:"type,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 type Request struct {
-	Type        string `json:"type"`
-	RequestID   string `json:"requestId"`
-	Timestamp   string `json:"timestamp"`
-	Reason      string `json:"reason"`
-	Error       Error  `json:"error"`
-	DialogState string `json:"dialogState"`
-	Locale      string `json:"locale"`
-	Intent      Intent `json:"intent"`
+	Type        string `json:"type,omitempty"`
+	RequestID   string `json:"requestId,omitempty"`
+	Timestamp   string `json:"timestamp,omitempty"`
+	Reason      string `json:"reason,omitempty"`
+	Error       Error  `json:"error,omitempty"`
+	DialogState string `json:"dialogState,omitempty"`
+	Locale      string `json:"locale,omitempty"`
+	Intent      Intent `json:"intent,omitempty"`
 }
 
 type MessageReceivedRequestBody struct {
-	Version string  `json:"version"`
-	Session Session `json:"session"`
-	Context Context `json:"context"`
-	Request Request `json:"request"`
+	Version string  `json:"version,omitempty"`
+	Session Session `json:"session,omitempty"`
+	Context Context `json:"context,omitempty"`
+	Request Request `json:"request,omitempty"`
 }

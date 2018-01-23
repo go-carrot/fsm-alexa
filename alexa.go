@@ -43,8 +43,8 @@ func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store) func(http.R
 		// Parse body into struct
 		cb := &MessageReceivedRequestBody{}
 		json.Unmarshal([]byte(body), cb)
+		fmt.Println(cb)
 
-		fmt.Println(cb.Request.Intent)
 		w.WriteHeader(http.StatusOK)
 	}
 }
