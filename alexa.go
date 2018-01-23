@@ -2,6 +2,7 @@ package fsmalexa
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -39,9 +40,11 @@ func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store) func(http.R
 		buf.ReadFrom(r.Body)
 		body := buf.String()
 
-		fmt.Println(body)
-		// Parse body into struct (TODO)
+		// Parse body into struct
+		cb := &MessageReceivedRequestBody{}
+		json.Unmarshal([]byte(body), cb)
 
+		fmt.Println(cb.Request.Intent)
 		w.WriteHeader(http.StatusOK)
 	}
 }
