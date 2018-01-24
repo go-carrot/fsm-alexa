@@ -12,28 +12,31 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func Start(stateMachine fsm.StateMachine, store fsm.Store) {
+// DistillIntent is a function that is responsible for converting
+// an intent into an input string
+type DistillIntent func(Intent) string
+
+func Start(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) {
 	graceful.LogListenAndServe(
 		&http.Server{
 			Addr:    ":" + os.Getenv("PORT"),
-			Handler: buildRouter(stateMachine, store),
+			Handler: buildRouter(stateMachine, store, distillIntent),
 		},
 	)
 }
 
-func buildRouter(stateMachine fsm.StateMachine, store fsm.Store) *httprouter.Router {
+func buildRouter(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) *httprouter.Router {
 	// Router
 	router := &httprouter.Router{
 		RedirectTrailingSlash:  true,
 		RedirectFixedPath:      true,
 		HandleMethodNotAllowed: true,
 	}
-	router.HandlerFunc(http.MethodPost, "/alexa", getAlexaWebhook(stateMachine, store))
+	router.HandlerFunc(http.MethodPost, "/alexa", getAlexaWebhook(stateMachine, store, distillIntent))
 	return router
 }
 
-//
-func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store) func(http.ResponseWriter, *http.Request) {
+func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get Body
 		buf := new(bytes.Buffer)
@@ -44,16 +47,16 @@ func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store) func(http.R
 		cb := &RequestBody{}
 		err := json.Unmarshal([]byte(body), cb)
 		if err != nil {
-			// TODO, add some logging here
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		// Get Traverser
 		newTraverser := false
-		traverser, err := store.FetchTraverser(cb.Session.SessionID)
+		traverser, err := store.FetchTraverser(cb.Session.User.UserID)
 		if err != nil {
-			traverser, _ = store.CreateTraverser(cb.Session.SessionID)
+			traverser, _ = store.CreateTraverser(cb.Session.User.UserID)
 			traverser.SetCurrentState("start")
 			newTraverser = true
 		}
@@ -69,12 +72,9 @@ func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store) func(http.R
 			currentState.EntryAction()
 		}
 
-		// TODO plug in distiller
-		// IntentDistiller <---
-		distillerValue := ""
-
 		// Transition
-		newState := currentState.Transition(distillerValue)
+		distilledValue := distillIntent(cb.Request.Intent)
+		newState := currentState.Transition(distilledValue)
 		err = newState.EntryAction()
 		if err == nil {
 			traverser.SetCurrentState(newState.Slug)
@@ -83,11 +83,9 @@ func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store) func(http.R
 		// Write Body
 		err = emitter.Flush()
 		if err != nil {
-			// TODO, add some logging here
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("response")
-		// w.WriteHeader(http.StatusOK)
 	}
 }
