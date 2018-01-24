@@ -41,10 +41,53 @@ func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store) func(http.R
 		body := buf.String()
 
 		// Parse body into struct
-		cb := &MessageReceivedRequestBody{}
-		json.Unmarshal([]byte(body), cb)
-		fmt.Println(cb)
+		cb := &RequestBody{}
+		err := json.Unmarshal([]byte(body), cb)
+		if err != nil {
+			// TODO, add some logging here
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-		w.WriteHeader(http.StatusOK)
+		// Get Traverser
+		newTraverser := false
+		traverser, err := store.FetchTraverser(cb.Session.SessionID)
+		if err != nil {
+			traverser, _ = store.CreateTraverser(cb.Session.SessionID)
+			traverser.SetCurrentState("start")
+			newTraverser = true
+		}
+
+		// Create Emitter
+		emitter := &AlexaEmitter{
+			ResponseWriter: w,
+		}
+
+		// Get Current State
+		currentState := stateMachine[traverser.CurrentState()](emitter, traverser)
+		if newTraverser {
+			currentState.EntryAction()
+		}
+
+		// TODO plug in distiller
+		// IntentDistiller <---
+		distillerValue := ""
+
+		// Transition
+		newState := currentState.Transition(distillerValue)
+		err = newState.EntryAction()
+		if err == nil {
+			traverser.SetCurrentState(newState.Slug)
+		}
+
+		// Write Body
+		err = emitter.Flush()
+		if err != nil {
+			// TODO, add some logging here
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		fmt.Println("response")
+		// w.WriteHeader(http.StatusOK)
 	}
 }

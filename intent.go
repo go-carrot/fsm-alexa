@@ -19,19 +19,25 @@ type Authority struct {
 	Values    []SlotValue `json:"values,omitempty"`
 }
 
+// Resolutions Object
+// https://developer.amazon.com/docs/custom-skills/request-types-reference.html#resolutions-object
 type Resolutions struct {
 	ResolutionsPerAuthority []Authority `json:"resolutionsPerAuthority,omitempty"`
 }
 
-type SlotObject struct {
+// Slot Object
+// https://developer.amazon.com/docs/custom-skills/request-types-reference.html#slot-object
+type Slot struct {
 	Name               string      `json:"name,omitempty"`
 	Value              string      `json:"value,omitempty"`
 	ConfirmationStatus string      `json:"confirmationStatus,omitempty"`
 	Resolutions        Resolutions `json:"resolutions,omitempty"`
 }
 
+// Intent Object
+// https://developer.amazon.com/docs/custom-skills/request-types-reference.html#intent-object
 type Intent struct {
-	Name               string                `json:"name,omitempty"`
-	ConfirmationStatus string                `json:"confirmationStatus,omitempty"`
-	Slots              map[string]SlotObject `json:"slots,omitempty"`
+	Name               string          `json:"name,omitempty"`
+	ConfirmationStatus string          `json:"confirmationStatus,omitempty"`
+	Slots              map[string]Slot `json:"slots,omitempty"`
 }
