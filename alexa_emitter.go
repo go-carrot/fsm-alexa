@@ -42,19 +42,29 @@ func (a *AlexaEmitter) Emit(input interface{}) error {
 		a.speechBuffer.WriteString("</p>")
 
 		// Options
-		a.speechBuffer.WriteString("<p>You can ")
+		optionsBuffer := new(bytes.Buffer)
 		for i, reply := range v.Replies {
-			a.speechBuffer.WriteString(reply)
+			optionsBuffer.WriteString(reply)
 			if i+2 < len(v.Replies) && len(v.Replies) > 2 {
-				a.speechBuffer.WriteString(", ")
+				optionsBuffer.WriteString(", ")
 			} else if i+1 < len(v.Replies) {
 				if len(v.Replies) > 2 {
-					a.speechBuffer.WriteString(", or ")
+					optionsBuffer.WriteString(", or ")
 				} else {
-					a.speechBuffer.WriteString(" or ")
+					optionsBuffer.WriteString(" or ")
 				}
 			}
 		}
+
+		// Determine format
+		format := "You can %v"
+		if v.RepliesFormat != "" {
+			format = v.RepliesFormat
+		}
+
+		// Write out options
+		a.speechBuffer.WriteString("<p>")
+		a.speechBuffer.WriteString(fmt.Sprintf(format, optionsBuffer.String()))
 		a.speechBuffer.WriteString("</p>")
 		return nil
 
