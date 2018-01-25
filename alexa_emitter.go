@@ -12,6 +12,7 @@ import (
 	"github.com/go-carrot/fsm-emitable"
 )
 
+// AlexaEmitter is an implementation of an FSM emitter for Amazon Alexa
 // https://developer.amazon.com/docs/custom-skills/speech-synthesis-markup-language-ssml-reference.html#ssml-supported
 type AlexaEmitter struct {
 	ResponseWriter io.Writer
@@ -19,6 +20,15 @@ type AlexaEmitter struct {
 	speechBuffer   bytes.Buffer
 }
 
+// Emit prepares the data to be output at the end of the request.
+//
+// Because Amazon Alexa expects all outgoing messages / data to be in the form
+// of a response to the inbound request (as compared to pushing messages), there
+// is a speechBuffer that is generated within this struct as Emit is called
+// throughout the lifecycle of a state.
+//
+// When Flush() is called on this struct, the SpeechBuffer is converted into the
+// expected Alexa response, and written to the ResponseWriter.
 func (a *AlexaEmitter) Emit(input interface{}) error {
 	switch v := input.(type) {
 
@@ -91,7 +101,9 @@ func (a *AlexaEmitter) Emit(input interface{}) error {
 	return errors.New("AlexaEmitter cannot handle " + reflect.TypeOf(input).String())
 }
 
+// Flush writes the expected Alexa response to the a.ResponseWriter
 func (a *AlexaEmitter) Flush() error {
+	// Prepare response body
 	response := &ResponseBody{
 		Version: "1.0",
 		Response: &Response{
@@ -99,7 +111,7 @@ func (a *AlexaEmitter) Flush() error {
 		},
 	}
 
-	// Handle Speech
+	// Handle speech
 	if a.hasSpeech {
 		ssml := "<speak>" + a.speechBuffer.String() + "</speak>"
 		response.Response.OutputSpeech = &OutputSpeech{
@@ -108,7 +120,7 @@ func (a *AlexaEmitter) Flush() error {
 		}
 	}
 
-	// Handle Response
+	// Output response
 	b, err := json.Marshal(response)
 	if err != nil {
 		return err

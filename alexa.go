@@ -5,38 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
-	"github.com/TV4/graceful"
 	"github.com/go-carrot/fsm"
-	"github.com/julienschmidt/httprouter"
 )
 
 // DistillIntent is a function that is responsible for converting
 // an intent into an input string
 type DistillIntent func(Intent) string
 
-func Start(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) {
-	graceful.LogListenAndServe(
-		&http.Server{
-			Addr:    ":" + os.Getenv("PORT"),
-			Handler: buildRouter(stateMachine, store, distillIntent),
-		},
-	)
-}
-
-func buildRouter(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) *httprouter.Router {
-	// Router
-	router := &httprouter.Router{
-		RedirectTrailingSlash:  true,
-		RedirectFixedPath:      true,
-		HandleMethodNotAllowed: true,
-	}
-	router.HandlerFunc(http.MethodPost, "/alexa", getAlexaWebhook(stateMachine, store, distillIntent))
-	return router
-}
-
-func getAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) func(http.ResponseWriter, *http.Request) {
+// GetAlexaWebhook returns the webhook that Alexa expects to communicate with
+func GetAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get Body
 		buf := new(bytes.Buffer)
