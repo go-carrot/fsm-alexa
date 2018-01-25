@@ -1,17 +1,12 @@
 package fsmalexa
 
-type Permissions struct {
-	ConsentToken string `json:"consentToken,omitempty"`
-}
-
-type Application struct {
-	ApplicationID string `json:"applicationId,omitempty"`
-}
-
-type User struct {
-	UserID      string      `json:"userId,omitempty"`
-	AccessToken string      `json:"accessToken,omitempty"`
-	Permissions Permissions `json:"permissions,omitempty"`
+// RequestBody Object
+// https://developer.amazon.com/docs/custom-skills/request-and-response-json-reference.html#request-body-parameters
+type RequestBody struct {
+	Version string  `json:"version,omitempty"`
+	Session Session `json:"session,omitempty"`
+	Context Context `json:"context,omitempty"`
+	Request Request `json:"request,omitempty"`
 }
 
 // Session Object
@@ -24,13 +19,31 @@ type Session struct {
 	User        User                   `json:"user,omitempty"`
 }
 
-type SupportedInterfaces struct {
-	AudioPlayer interface{} `json:"AudioPlayer,omitempty"`
+// Application Object
+// See Session
+type Application struct {
+	ApplicationID string `json:"applicationId,omitempty"`
 }
 
-type Device struct {
-	DeviceID            string              `json:"deviceId,omitempty"`
-	SupportedInterfaces SupportedInterfaces `json:"SupportedInterfaces,omitempty"`
+// User Object
+// See Session
+type User struct {
+	UserID      string      `json:"userId,omitempty"`
+	AccessToken string      `json:"accessToken,omitempty"`
+	Permissions Permissions `json:"permissions,omitempty"`
+}
+
+// Permissions Object
+// See User
+type Permissions struct {
+	ConsentToken string `json:"consentToken,omitempty"`
+}
+
+// Context Object
+// https://developer.amazon.com/docs/custom-skills/request-and-response-json-reference.html#context-object
+type Context struct {
+	System      System      `json:"System,omitempty"`
+	AudioPlayer AudioPlayer `json:"AudioPlayer,omitempty"`
 }
 
 // System Object
@@ -43,6 +56,13 @@ type System struct {
 	APIAccessToken string      `json:"apiAccessToken,omitempty"`
 }
 
+// Device Object
+// See System
+type Device struct {
+	DeviceID            string              `json:"deviceId,omitempty"`
+	SupportedInterfaces SupportedInterfaces `json:"SupportedInterfaces,omitempty"`
+}
+
 // AudioPlayer Object
 // https://developer.amazon.com/docs/custom-skills/request-and-response-json-reference.html#audioplayer-object
 type AudioPlayer struct {
@@ -51,16 +71,10 @@ type AudioPlayer struct {
 	OffsetInMilliseconds int    `json:"offsetInMilliseconds,omitempty"`
 }
 
-// Context Object
-// https://developer.amazon.com/docs/custom-skills/request-and-response-json-reference.html#context-object
-type Context struct {
-	System      System      `json:"System,omitempty"`
-	AudioPlayer AudioPlayer `json:"AudioPlayer,omitempty"`
-}
-
-type Error struct {
-	Type    string `json:"type,omitempty"`
-	Message string `json:"message,omitempty"`
+// SupportedInterfaces Object
+// See AudioPlayer
+type SupportedInterfaces struct {
+	AudioPlayer interface{} `json:"AudioPlayer,omitempty"`
 }
 
 // A Request object that provides the details of the user’s request. There are several different request types avilable, see:
@@ -78,11 +92,9 @@ type Request struct {
 	Intent      Intent `json:"intent,omitempty"`
 }
 
-// RequestBody Object
-// https://developer.amazon.com/docs/custom-skills/request-and-response-json-reference.html#request-body-parameters
-type RequestBody struct {
-	Version string  `json:"version,omitempty"`
-	Session Session `json:"session,omitempty"`
-	Context Context `json:"context,omitempty"`
-	Request Request `json:"request,omitempty"`
+// Error Object
+// See Request
+type Error struct {
+	Type    string `json:"type,omitempty"`
+	Message string `json:"message,omitempty"`
 }
