@@ -16,7 +16,7 @@ type DistillIntent func(Intent) string
 // GetAlexaWebhook returns the webhook that Alexa expects to communicate with
 func GetAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store, distillIntent DistillIntent) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Get Body
+		// Get body
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(r.Body)
 		body := buf.String()
@@ -30,7 +30,7 @@ func GetAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store, distillInte
 			return
 		}
 
-		// Get Traverser
+		// Get traverser
 		newTraverser := false
 		traverser, err := store.FetchTraverser(cb.Session.User.UserID)
 		if err != nil {
@@ -39,12 +39,12 @@ func GetAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store, distillInte
 			newTraverser = true
 		}
 
-		// Create Emitter
+		// Create emitter
 		emitter := &AlexaEmitter{
 			ResponseWriter: w,
 		}
 
-		// Get Current State
+		// Get current state
 		currentState := stateMachine[traverser.CurrentState()](emitter, traverser)
 		if newTraverser {
 			currentState.EntryAction()
@@ -58,7 +58,7 @@ func GetAlexaWebhook(stateMachine fsm.StateMachine, store fsm.Store, distillInte
 			traverser.SetCurrentState(newState.Slug)
 		}
 
-		// Write Body
+		// Write body
 		err = emitter.Flush()
 		if err != nil {
 			fmt.Println(err)
